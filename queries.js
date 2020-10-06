@@ -18,9 +18,9 @@ const getUsers = (request, response) => {
 }
 
 //Get the name of user by ID
-const getUserID = (request, response) => {
+const getUserByID = (request, response) => {
     const id = request.params.id;
-    pool.query('SELECT * FROM users WHERE id = $id', (error, results) => {
+    pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
         if(error) {
             throw error;
         }
@@ -31,11 +31,12 @@ const getUserID = (request, response) => {
 //Post a new user
 const postUser = (request, response) => {
     const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
-    pool.query('INSERT INTO users(name, gender, cmnd, email, birthdate, signupdate, expirydate) VALUE ($name, $gender, $email, $birthdate, $signupdate, $expiredate)', (error, result) => {
+    pool.query('INSERT INTO users(name, gender, cmnd, email, birthdate, signupdate, expirydate) VALUES ($1, $2, $3, $4, $5, $6, $7)', 
+    [name, gender, cmnd, email, birthdate, signupdate, expirydate], (error, result) => {
         if(error) {
             throw error;
         }
-        response.status(201).send('User added with ID: ${result.insertID}');
+        response.status(201).send(`User added with ID: ${JSON.stringify(result)}`);
     })
 
 }
@@ -44,7 +45,8 @@ const postUser = (request, response) => {
 const updateUser = (request, response) => {
     const id = request.params.id;
     const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
-    pool.query('UPDATE users SET name = $name, cmnd = $cmnd, email = $email, gender = $gender, birthdate = $birthdate where id = $id', (error, result) => {
+    pool.query('UPDATE users SET name = $1, cmnd = $2, email = $3, gender = $4, birthdate = $5, signupdate = $6, expirydate = $7 where id = $8',
+    [name, cmnd, email, gender, birthdate, signupdate, expirydate, id], (error, result) => {
         if(error) {
             throw error;
         }
@@ -55,7 +57,7 @@ const updateUser = (request, response) => {
 //Delete a user
 const deleteUser = (request, response) => {
     const id = request.params.id;
-    pool.query('DELETE FROM users WHERE id = $id', (error, results) => {
+    pool.query('DELETE FROM users WHERE id = $1', [id], (error, results) => {
         if(error) {
             throw error;
         }
@@ -63,30 +65,9 @@ const deleteUser = (request, response) => {
     })
 }
 
-//Get list of books
-const getBooks = (req, res) => {
-    pool.query('SELECT * FROM books', (err, results) => {
-        if(err) {
-            throw err;
-        }
-        res.status(200).json(results.rows);
-    })
-}
-
-//Get a book by ID
-const getBookID = (req, res) => {
-    const id = req.params.id;
-    pool.query('SELECT * FROM books WHERE id = $id', (err, results) => {
-        if(err) {
-            throw err;
-        }
-        res.status(200).json(results);
-    })
-}
-
 module.exports = {
     getUsers,
-    getUserID,
+    getUserByID,
     postUser,
     updateUser,
     deleteUser,
