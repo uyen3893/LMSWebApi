@@ -63,6 +63,27 @@ const deleteUser = (request, response) => {
     })
 }
 
+//Get list of books
+const getBooks = (req, res) => {
+    pool.query('SELECT * FROM books', (err, results) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).json(results.rows);
+    })
+}
+
+//Get a book by ID
+const getBookID = (req, res) => {
+    const id = req.params.id;
+    pool.query('SELECT * FROM books WHERE id = $id', (err, results) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).json(results);
+    })
+}
+
 module.exports = {
     getUsers,
     getUserID,
