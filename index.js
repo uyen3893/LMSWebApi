@@ -21,8 +21,11 @@ app.listen(port, () => {
 
   app.get('/users', db.getUsers)
   app.get('/users/:id', db.getUserByID)
-  app.post('/users', db.postUser)
+  app.post('/users', db.createUser)
   app.put('/users/:id', db.updateUser)
   app.delete('/users/:id', db.deleteUser)
-
-  
+  app.get('/books', db.getBooks)
+  app.get('/books/:id', db.getBookByID)
+  app.post('/books', db.createBook)
+  app.put('/books/:id', db.updateBook)
+  app.delete('/books/:id', db.deleteBook)
