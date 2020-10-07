@@ -28,8 +28,8 @@ const getUserByID = (request, response) => {
     })
 }
 
-//Post a new user
-const postUser = (request, response) => {
+//Create a new user
+const createUser = (request, response) => {
     const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
     pool.query('INSERT INTO users(name, gender, cmnd, email, birthdate, signupdate, expirydate) VALUES ($1, $2, $3, $4, $5, $6, $7)', 
     [name, gender, cmnd, email, birthdate, signupdate, expirydate], (error, result) => {
@@ -65,10 +65,73 @@ const deleteUser = (request, response) => {
     })
 }
 
+//Get list of books
+const getBooks = (req, res) => {
+    pool.query('SELECT b.id, b.isbn, b.name, b.author, b.publisher, b.quantity, c.name AS name_category FROM books b JOIN categories c ON b.id_category = c.id', 
+    (err, results) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).json(results.rows);
+    })
+}
+
+//Get a book by ID
+const getBookByID = (req, res) => {
+    const id = req.params.id;
+    pool.query('SELECT * FROM books WHERE id = $1', [id], (err, results) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).json(results);
+    })
+}
+
+//Create a book
+const createBook = (req, res) => {
+    const {name, isbn, author, publisher, quantity, id_category} = req.body;
+    pool.query('INSERT INTO books (name, isbn, author, publisher, quantity, id_category) VALUES ($1, $2, $3, $4, $5, $6)', 
+    [name, isbn, author, publisher, quantity, id_category], (err, result) => {
+        if(err) {
+            throw err;
+        }
+        res.status(201).send(`Add new book with ID: ${result.id}`);
+    })
+}
+
+//Update a book
+const updateBook = (req, res) => {
+    const id = req.params.id;
+    const {name, isbn, author, publisher, quantity, id_category} = req.body;
+    pool.query('UPDATE books SET name = $1, isbn = $2, author = $3, publisher = $4, quantity = $5, id_category = $6 WHERE id = $7',
+    [name, isbn, author, publisher, quantity, id_category, id], (err, results) => {
+        if(err){
+            throw err;
+        }
+        res.status(200).send(`Update a book with id: ${id}`);
+    })
+}
+
+//Delete a book
+const deleteBook = (req, res) => {
+    const id = req.params.id;
+    pool.query('DELETE FROM books WHERE id = $1', [id], (err, result) => {
+        if(err) {
+            throw error;
+        }
+        res.status(200).send(`Delete a book with ID: ${id}`);
+    })
+}
+
 module.exports = {
     getUsers,
     getUserByID,
-    postUser,
+    createUser,
     updateUser,
     deleteUser,
+    getBooks,
+    getBookByID,
+    createBook,
+    updateBook,
+    deleteBook
   }
