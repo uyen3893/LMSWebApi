@@ -117,12 +117,65 @@ const deleteBook = (req, res) => {
     const id = req.params.id;
     pool.query('DELETE FROM books WHERE id = $1', [id], (err, result) => {
         if(err) {
-            throw error;
+            throw err;
         }
         res.status(200).send(`Delete a book with ID: ${id}`);
     })
 }
 
+//Get the list of category
+const getCate = (req, res) => {
+    pool.query('SELECT * FROM categories', (err, results) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).json(results.rows);
+    })
+}
+
+//Get a category by ID
+const getCateByID = (req, res) => {
+    const id = req.params.id;
+    pool.query('SELECT * FROM categories WHERE id = $1', [id], (err, result) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).json(result.rows)
+    })
+}
+//Create a new category
+const createCate = (req, res) => {
+    const {name} = req.body;
+    pool.query('INSERT INTO categories (name) VALUES ($1)', [name], (err, result) => {
+        if(err){
+            throw err;
+        }
+        res.status(201).send(`Create new category successfully`);
+    })
+}
+
+//Update category
+const updateCate = (req, res) => {
+    const id = req.params.id;
+    const {name} = req.body;
+    pool.query('UPDATE categories SET name = $1 WHERE id = $2', [name, id], (err, result) => {
+        if(err){
+            throw err;
+        }
+        res.status(200).send(`Update category with the ID: ${id}`);
+    })
+}
+
+//Delete category
+const deleteCate = (req, res) => {
+    const id = req.params.id;
+    pool.query('DELETE FROM categories WHERE id = $1', [id], (err, result) => {
+        if(err) {
+            throw err;
+        }
+        res.status(200).send(`Delete category with the ID: ${id}`)
+    })
+}
 module.exports = {
     getUsers,
     getUserByID,
@@ -133,5 +186,10 @@ module.exports = {
     getBookByID,
     createBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    getCate,
+    getCateByID,
+    createCate,
+    updateCate,
+    deleteCate
   }
