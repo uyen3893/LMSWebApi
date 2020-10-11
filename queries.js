@@ -124,7 +124,7 @@ const deleteBook = (req, res) => {
 }
 
 //Get the list of category
-const getCate = (req, res) => {
+const getCategory = (req, res) => {
     pool.query('SELECT * FROM categories', (err, results) => {
         if(err) {
             throw err;
@@ -134,7 +134,7 @@ const getCate = (req, res) => {
 }
 
 //Get a category by ID
-const getCateByID = (req, res) => {
+const getCategoryByID = (req, res) => {
     const id = req.params.id;
     pool.query('SELECT * FROM categories WHERE id = $1', [id], (err, result) => {
         if(err) {
@@ -144,7 +144,7 @@ const getCateByID = (req, res) => {
     })
 }
 //Create a new category
-const createCate = (req, res) => {
+const createCategory = (req, res) => {
     const {name} = req.body;
     pool.query('INSERT INTO categories (name) VALUES ($1)', [name], (err, result) => {
         if(err){
@@ -155,7 +155,7 @@ const createCate = (req, res) => {
 }
 
 //Update category
-const updateCate = (req, res) => {
+const updateCategory = (req, res) => {
     const id = req.params.id;
     const {name} = req.body;
     pool.query('UPDATE categories SET name = $1 WHERE id = $2', [name, id], (err, result) => {
@@ -167,7 +167,7 @@ const updateCate = (req, res) => {
 }
 
 //Delete category
-const deleteCate = (req, res) => {
+const deleteCategory = (req, res) => {
     const id = req.params.id;
     pool.query('DELETE FROM categories WHERE id = $1', [id], (err, result) => {
         if(err) {
@@ -187,9 +187,9 @@ module.exports = {
     createBook,
     updateBook,
     deleteBook,
-    getCate,
-    getCateByID,
-    createCate,
-    updateCate,
-    deleteCate
+    getCategory,
+    getCategoryByID,
+    createCategory,
+    updateCategory,
+    deleteCategory
   }

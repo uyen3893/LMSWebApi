@@ -31,8 +31,8 @@ app.listen(port, () => {
   app.put('/books/:id', db.updateBook)
   app.delete('/books/:id', db.deleteBook)
   //API of categories
-  app.get('/categories', db.getCate)
-  app.get('/categories/:id', db.getCateByID)
-  app.post('/categories', db.createCate)
-  app.put('/categories/:id', db.updateCate)
-  app.delete('/categories/:id', db.deleteCate)
+  app.get('/categories', db.getCategory)
+  app.get('/categories/:id', db.getCategoryByID)
+  app.post('/categories', db.createCategory)
+  app.put('/categories/:id', db.updateCategory)
+  app.delete('/categories/:id', db.deleteCategory)
