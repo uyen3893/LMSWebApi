@@ -44,7 +44,7 @@ app.listen(port, () => {
   app.delete('/bookchecks/:id', db.deleteBookCheck)
   //API of reports
   app.get('/reports/numberofusers', db.getNumberOfUsersReport)
-  app.get('/reports/numberofgender', db.getNumberOfUsersGender)
+  app.get('/reports/numberofusersbygender', db.getNumberOfUsersByGender)
   app.get('/reports/numberofbooks', db.getNumberOfBooks)
   app.get('/reports/numberofborrowedbooks', db.getNumberOfBorrowedBooks)
   app.get('/reports/numberofbooksbycategories', db.getNumberOfBooksByCategories)
