@@ -36,3 +36,15 @@ app.listen(port, () => {
   app.post('/categories', db.createCategory)
   app.put('/categories/:id', db.updateCategory)
   app.delete('/categories/:id', db.deleteCategory)
+  //API of bookchecks
+  app.get('/bookchecks', db.getBookChecks) 
+  app.get('/bookchecks/:id', db.getBookChecksByID)
+  app.post('/bookchecks', db.createBookCheck)
+  app.put('/bookchecks/:id', db.updateBookCheck)
+  app.delete('/bookchecks/:id', db.deleteBookCheck)
+  //API of reports
+  app.get('/reports/numberofusers', db.getNumberOfUsersReport)
+  app.get('/reports/numberofusersbygender', db.getNumberOfUsersByGender)
+  app.get('/reports/numberofbooks', db.getNumberOfBooks)
+  app.get('/reports/numberofborrowedbooks', db.getNumberOfBorrowedBooks)
+  app.get('/reports/numberofbooksbycategories', db.getNumberOfBooksByCategories)
