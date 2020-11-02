@@ -29,17 +29,6 @@ const cmnd = '82764619'
 describe("users api", function() {
     describe('get users', async() => {
         it("1. should return status code 200 and the number of data response is equal the number of users in database when called correctly", async () => {
-            // axios.get( `${process.env.API_URL}/users`)
-            //     .then(function(response) {
-            //         let apiUsersCount = response.data.length;
-            //         pool.query('SELECT COUNT(1) FROM users', (error,result) => {
-            //             if(error) {
-            //                 throw error;
-            //             }
-            //             const dbUsersCount = result.rows[0].count;
-            //             assert.strictEqual(apiUsersCount + 1, parseInt(dbUsersCount));
-            //         })
-            //     })
             let response = await axios.get( `${process.env.API_URL}/users`);
             let apiUsersCount = response.data.length;
             pool.query('SELECT COUNT(1) FROM users', (error,result) => {
@@ -54,22 +43,6 @@ describe("users api", function() {
     })
 
     describe("get user by ID" , async() => {
-        // var new_user_id;
-        // before(function() {
-        //     // pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', 
-        //     // ['1992-02-02', '2020-03-03', 'Nguyen Van A', '24314198', 'aa@email.com', false, '2023-03-03'], 
-        //     // (error, result) => {
-        //     //     if(error) {
-        //     //         throw error
-        //     //     }
-        //     //     new_user_id = result.rows[0].new_id;
-        //     // })
-        //     ;(async () => {
-        //         const result = await pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', ['1992-02-02', '2020-03-03', 'Nguyen Van A', '24314198', 'aa@email.com', false, '2023-03-03'])
-        //         new_user_id = result.rows[0].new_id;
-        //         console.log("dbid: " + new_user_id)
-        //     })
-        // })
         it('2. should return status 200 and correct user when called correctly', async() => {
             const result = await pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', 
             [birthdate, signupdate, name, cmnd, email, gender, expirydate])
@@ -105,7 +78,7 @@ describe("users api", function() {
             })
             await pool.query('CALL public."DeleteUser" ($1)', [result.rows[0].new_id])
         })
-        it('4. should return status 500 and response will be null when called with incorrect id\'s value', async() => {
+        it('4. should return status 500 and response will be error when called with incorrect id\'s value', async() => {
             var new_user_id;
             const result = await pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', 
             [birthdate, signupdate, name, cmnd, email, gender, expirydate])
@@ -121,7 +94,7 @@ describe("users api", function() {
     })
 
     describe('create user', async() => {
-        it('5. should return status 201 and have a different id when called', async() => {
+        it('5. should return status 201 and successfully create new user', async() => {
             const response = await axios.post(`${process.env.API_URL}/users`, {
                 name: name,
                 gender: gender,
@@ -131,7 +104,6 @@ describe("users api", function() {
                 signupdate: signupdate.toLocaleDateString(),
                 expirydate: expirydate.toLocaleDateString()
             })
-            console.log('id khuong: ' + response.data.InsertedUserId)
             const result = pool.query('SELECT * FROM users WHERE id = $1', [response.data.InsertedUserId], (err, result) => {
                 if(err) {
                     throw err;
@@ -146,6 +118,7 @@ describe("users api", function() {
                 assert.strictEqual(dbUser.expirydate.toISOString(), expirydate.toISOString());
             })
             assert.strictEqual(response.status, 201)
+            await pool.query('CALL public."DeleteUser" ($1)', [result.rows[0].new_id])
         })
         it('6. should return status 500 and State will be error when called with incorrect parameters', async() => {
             await axios.post(`${process.env.API_URL}/users`, {}).catch(error => {
@@ -171,7 +144,6 @@ describe("users api", function() {
             updatedSignUpDate.setFullYear(signupdate.getFullYear() + 1)
             const updatedExpiryDate = expirydate
             updatedExpiryDate.setFullYear(expirydate.getFullYear() + 1)
-            console.log('expected date: ' + updatedExpiryDate)
             const response = await axios.put(`${process.env.API_URL}/users/${new_user_id}`, 
             {
                 name: updatedName,
@@ -196,14 +168,11 @@ describe("users api", function() {
             assert.strictEqual(dbUser.signupdate.toISOString(), updatedSignUpDate.toISOString());
             assert.strictEqual(dbUser.expirydate.toISOString(), updatedExpiryDate.toISOString());
 
-            console.log('actual date: ' + dbUser.expirydate)
             await pool.query('CALL public."DeleteUser" ($1)', [new_user_id])
         })
 
         it('8. should return status 500 and State will be error when called incorrectly', async() => {
-            await axios.put(`${process.env.API_URL}/users/1`, {
-                gender: 'true'
-            }).catch(error => {
+            await axios.put(`${process.env.API_URL}/users/1`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
                 assert.strictEqual(error.response.data.State, State.ERROR)
                 assert.strictEqual(error.response.data.ErrorMessage, ErrorResponseMessage)
