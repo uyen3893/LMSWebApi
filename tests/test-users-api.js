@@ -82,13 +82,11 @@ describe("users api", function() {
             var new_user_id;
             const result = await pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', 
             [birthdate, signupdate, name, cmnd, email, gender, expirydate])
-            new_user_id = result.rows[0].new_id.substring(0,36) + '1'
-            console.log("id: " + new_user_id)
-            await axios.get( `${process.env.API_URL}/users/${new_user_id}`).catch(error=>{
-                assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, State.ERROR)
-                assert.strictEqual(error.response.data.ErrorMessage, ErrorResponseMessage)
-            })
+            new_user_id = result.rows[0].new_id.substring(0,35) + '1'
+            console.log("id : " + new_user_id)
+            const response = await axios.get( `${process.env.API_URL}/users/${new_user_id}`)
+            assert.ifError(response.data[0], null)
+            assert.strictEqual(response.status, 200)
             await pool.query('CALL public."DeleteUser" ($1)', [result.rows[0].new_id])
         })
     })
@@ -118,7 +116,7 @@ describe("users api", function() {
                 assert.strictEqual(dbUser.expirydate.toISOString(), expirydate.toISOString());
             })
             assert.strictEqual(response.status, 201)
-            await pool.query('CALL public."DeleteUser" ($1)', [result.rows[0].new_id])
+            await pool.query('CALL public."DeleteUser" ($1)', [response.data.InsertedUserId])
         })
         it('6. should return status 500 and State will be error when called with incorrect parameters', async() => {
             await axios.post(`${process.env.API_URL}/users`, {}).catch(error => {
