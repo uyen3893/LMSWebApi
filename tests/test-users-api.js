@@ -85,7 +85,7 @@ describe("users api", function() {
             new_user_id = result.rows[0].new_id.substring(0,35) + '1'
             console.log("id : " + new_user_id)
             const response = await axios.get( `${process.env.API_URL}/users/${new_user_id}`)
-            assert.ifError(response.data[0], null)
+            assert.strictEqual(response.data.length, 0)
             assert.strictEqual(response.status, 200)
             await pool.query('CALL public."DeleteUser" ($1)', [result.rows[0].new_id])
         })
