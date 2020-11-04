@@ -78,7 +78,7 @@ describe("users api", function() {
             })
             await pool.query('CALL public."DeleteUser" ($1)', [result.rows[0].new_id])
         })
-        it('4. should return status 500 and response will be error when called with incorrect id\'s value', async() => {
+        it('4. should return status 200 and empty array when called with incorrect id\'s value', async() => {
             var new_user_id;
             const result = await pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', 
             [birthdate, signupdate, name, cmnd, email, gender, expirydate])
