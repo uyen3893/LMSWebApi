@@ -47,5 +47,8 @@ module.exports = {
         sql.query('SELECT COUNT(1) FROM users', (error, result) => {
             callback(error, result)
         })
+    },
+    async count_number_of_users_async () {
+        return await sql.query_async('SELECT COUNT(1) FROM users')
     }
 }

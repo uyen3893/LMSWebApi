@@ -101,10 +101,14 @@ const createUser = (request, response) => {
 }
 
 const createUserAsync = async (request, response) => {
-    const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
     try {
+        const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
         const result = await dbusers.create_user_async(birthdate, signupdate, name, cmnd, email, gender, expirydate)
-        response.status(200).json(result.rows)
+        let res = {
+            State: State.SUCCESS,
+            InsertedUserId: result.rows[0].new_id
+        }
+        response.status(201).json(res);
     } catch(error) {
         console.error(error);
             let err = {
@@ -179,8 +183,8 @@ const deleteUser = (request, response) => {
 }
 
 const deleteUserAsync = async (request, response) => {
-    const id = request.params.id;
     try {
+        const id = request.params.id;
         const result = await dbusers.delete_user_async(id)
         let res = {
             State: State.SUCCESS,
@@ -317,7 +321,7 @@ const updateBook = (request, response) => {
             State: State.SUCCESS,
             UpdatedBookId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     })
 }
 const updateBookAsync = async (request, response) =>{
@@ -329,7 +333,7 @@ const updateBookAsync = async (request, response) =>{
             State: State.SUCCESS,
             UpdatedBookId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     } catch (error) {
         console.error(error);
             let err = {
@@ -357,7 +361,7 @@ const deleteBook = (request, response) => {
             State: State.SUCCESS,
             DeletedBookId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     })
 }
 
@@ -369,7 +373,7 @@ const deleteBookAsync = async (request, response) => {
             State: State.SUCCESS,
             DeletedBookId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     } catch (error) {
         console.error(error);
         let err = {
@@ -498,7 +502,7 @@ const updateCategory = (request, response) => {
             State: State.SUCCESS,
             UpdatedCategoryId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     })
 }
 const updateCategoryAsync = async (request, response) => {
@@ -510,7 +514,7 @@ const updateCategoryAsync = async (request, response) => {
             State: State.SUCCESS,
             UpdatedCategoryId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     } catch (error) {
         console.error(error);
             let err = {
@@ -538,7 +542,7 @@ const deleteCategory = (request, response) => {
             State: State.SUCCESS,
             DeletedCategoryId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     })
 }
 
@@ -550,7 +554,7 @@ const deleteCategoryAsync = async (request, response) => {
             State: State.SUCCESS,
             DeletedCategoryId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     } catch (error) {
         console.error(error);
             let err = {
@@ -678,7 +682,7 @@ const updateBookCheck = (request, response) => {
             State: State.SUCCESS,
             UpdatedBookCheckId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     })
 }
 const updateBookCheckAsync = async (request, response) => {
@@ -690,7 +694,7 @@ const updateBookCheckAsync = async (request, response) => {
             State: State.SUCCESS,
             UpdatedBookCheckId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     } catch (error) {
         console.error(error);
             let err = {
@@ -718,7 +722,7 @@ const deleteBookCheck = (request, response) => {
             State: State.SUCCESS,
             DeletedBookCheckId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     })
 }
 const deleteBookCheckAsync = async (request, response) => {
@@ -729,7 +733,7 @@ const deleteBookCheckAsync = async (request, response) => {
             State: State.SUCCESS,
             DeletedBookCheckId: id
         }
-        response.status(201).json(res);
+        response.status(200).json(res);
     } catch(error) {
         console.error(error);
             let err = {
