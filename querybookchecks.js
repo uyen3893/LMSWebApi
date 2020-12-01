@@ -1,4 +1,4 @@
-const Pool = require('pg').Pool
+
 const dbcheckbooks = require('./dbcheckbooks')
 
 const State = {

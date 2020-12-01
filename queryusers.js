@@ -1,4 +1,3 @@
-const Pool = require('pg').Pool
 const dbusers = require('./dbusers')
 const sql = require('./sql')
 

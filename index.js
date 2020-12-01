@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const queryUsers = require('./queriesusers')
+const queryUsers = require('./queryusers')
 const queryBooks = require('./querybooks')
 const queryCategories = require('./querycategories')
 const queryBookChecks = require('./querybookchecks')

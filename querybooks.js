@@ -1,4 +1,4 @@
-const Pool = require('pg').Pool
+
 const dbbooks = require('./dbbooks')
 const sql = require('./sql')
 
