@@ -1,7 +1,7 @@
 require('dotenv').config()
 const assert = require('assert');
 const Pool = require('pg').Pool
-
+const dbusers = require('../dbusers')
 const axios = require('axios')
 const pool = new Pool({
     host: process.env.DB_HOST,
@@ -29,31 +29,25 @@ const cmnd = '82764619'
 describe("users api", async() => {
     let new_user_id = null;
     before (async() => {
-        let result = await pool.query('SELECT public."InsertUser"($1, $2, $3, $4, $5, $6, $7) as new_id', 
-            [birthdate, signupdate, name, cmnd, email, gender, expirydate])
+        const result = await dbusers.create_user_async(birthdate, signupdate, name, cmnd, email, gender, expirydate)
         new_user_id = result.rows[0].new_id
-        console.log('id: ' + new_user_id)
     })
     describe('get users', async() => {
         it("1. should return status code 200 and the number of data response is equal the number of users in database when called correctly", async () => {
             let response = await axios.get( `${process.env.API_URL}/users`);
             let apiUsersCount = response.data.length;
-            pool.query('SELECT COUNT(1) FROM users', (error,res) => {
-                if(error) {
-                    throw error;
-                }
-                const dbUsersCount = res.rows[0].count;
-                assert.strictEqual(apiUsersCount, parseInt(dbUsersCount));
-            })
+            const result = await dbusers.count_number_of_users_async()
+            const dbUsersCount = result.rows[0].count;
+            assert.strictEqual(apiUsersCount, parseInt(dbUsersCount));
             assert.strictEqual(response.status, 200);
         });
     })
 
     describe("get user by ID" , async() => {
         it('2. should return status 200 and correct user when called correctly', async() => {
-            const response = await axios.get( `${process.env.API_URL}/users/${new_user_id}`);
+            const response = await axios.get(`${process.env.API_URL}/users/${new_user_id}`);
             let apiUser = response.data[0];
-            const resultFromData = await pool.query('SELECT * FROM users WHERE id = $1', [new_user_id])
+            const resultFromData = await dbusers.get_user_by_id_async(new_user_id)
 
             const dbUser = resultFromData.rows[0];
             assert.strictEqual(apiUser.id, dbUser.id);
@@ -93,19 +87,16 @@ describe("users api", async() => {
                 signupdate: signupdate.toLocaleDateString(),
                 expirydate: expirydate.toLocaleDateString()
             })
-            const result = pool.query('SELECT * FROM users WHERE id = $1', [response.data.InsertedUserId], (err, result) => {
-                if(err) {
-                    throw err;
-                }
-                const dbUser = result.rows[0];
-                assert.strictEqual(dbUser.name, name);
-                assert.strictEqual(dbUser.cmnd, cmnd);
-                assert.strictEqual(dbUser.gender, gender);
-                assert.strictEqual(dbUser.birthdate.toISOString(), birthdate.toISOString());
-                assert.strictEqual(dbUser.email, email);
-                assert.strictEqual(dbUser.signupdate.toISOString(), signupdate.toISOString());
-                assert.strictEqual(dbUser.expirydate.toISOString(), expirydate.toISOString());
-            })
+            const result = await dbusers.get_user_by_id_async(response.data.InsertedUserId)
+            const dbUser = result.rows[0];
+            assert.strictEqual(dbUser.name, name);
+            assert.strictEqual(dbUser.cmnd, cmnd);
+            assert.strictEqual(dbUser.gender, gender);
+            assert.strictEqual(dbUser.birthdate.toISOString(), birthdate.toISOString());
+            assert.strictEqual(dbUser.email, email);
+            assert.strictEqual(dbUser.signupdate.toISOString(), signupdate.toISOString());
+            assert.strictEqual(dbUser.expirydate.toISOString(), expirydate.toISOString());
+    
             assert.strictEqual(response.status, 201)
         })
         it('6. should return status 500 and State will be error when called with incorrect parameters', async() => {
@@ -143,7 +134,7 @@ describe("users api", async() => {
             assert.strictEqual(response.data.State, State.SUCCESS)
             assert.strictEqual(response.data.UpdatedUserId, new_user_id)
 
-            const updatedResult = await pool.query('SELECT * FROM users WHERE id = $1', [new_user_id])
+            const updatedResult = await dbusers.get_user_by_id_async(new_user_id)
             const dbUser = updatedResult.rows[0];
             assert.strictEqual(dbUser.name, updatedName);
             assert.strictEqual(dbUser.cmnd, updatedCmnd);
@@ -168,7 +159,7 @@ describe("users api", async() => {
     describe('delete user', async() => {
         it('9. should return status 200 and delete user when called successfully', async() => {
             const response = await axios.delete( `${process.env.API_URL}/users/${new_user_id}`)
-            const dbResult = await pool.query('SELECT * FROM users WHERE id = $1', [new_user_id])
+            const dbResult = await dbusers.get_user_by_id_async(new_user_id)
             assert.strictEqual(dbResult.rowCount, 0)
             assert.strictEqual(response.status, 200)
             assert.strictEqual(response.data.State, State.SUCCESS)
@@ -185,6 +176,6 @@ describe("users api", async() => {
     })
 
     await after(async() => {
-        await pool.query('CALL public."DeleteUser" ($1)', [new_user_id])
+        await dbusers.delete_user_async(new_user_id)
     })
 })
