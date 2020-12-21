@@ -46,5 +46,8 @@ module.exports = {
     },
     async delete_book_async(id) {
         return await sql.query_async('CALL public."DeleteBook" ($1)', [id])
+    },
+    async count_number_of_books_async() {
+        return await sql.query_async('SELECT COUNT(1) FROM books')
     }
 }
