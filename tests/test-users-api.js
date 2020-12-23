@@ -1,15 +1,8 @@
 require('dotenv').config()
-const assert = require('assert');
-const Pool = require('pg').Pool
+const assert = require('assert')
 const dbusers = require('../dbusers')
 const axios = require('axios')
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    port: process.env.DB_PORT
-})
+
 const State = {
     SUCCESS: "Success",
     ERROR: "Error"
@@ -70,7 +63,11 @@ describe("users api", async() => {
             })
         })
         it('4. should return status 200 and empty array when called with incorrect id\'s value', async() => {
-            let new_id = new_user_id.substring(0,35) + '1'
+            if(new_user_id.charAt(35) == '1') {
+                new_id = new_user_id.substring(0,35) + '2'
+            } else {
+                new_id = new_user_id.substring(0,35) + '1'
+            }
             const response = await axios.get( `${process.env.API_URL}/users/${new_id}`)
             assert.strictEqual(response.data.length, 0)
             assert.strictEqual(response.status, 200)
@@ -165,17 +162,29 @@ describe("users api", async() => {
             assert.strictEqual(response.data.State, State.SUCCESS)
             assert.strictEqual(response.data.DeletedUserId, new_user_id)
         })
-        it('10. should return status 500 and State will be error when called incorrectly', async() => {
+        it('10. should return status 500 and State will be error when called with wrong id\'s format', async() => {
             const response = await axios.delete( `${process.env.API_URL}/users/1`).catch(error => {
                 assert.strictEqual(error.response.status, 500)
                 assert.strictEqual(error.response.data.State, State.ERROR)
                 assert.strictEqual(error.response.data.ErrorMessage, ErrorResponseMessage)
             })
-
+        })
+        it('11.should return status 500 and State will be error when called with wrong id\'s value', async() => {
+            let new_id = null
+            if(new_user_id.charAt(35) != '1') {
+                new_id = new_user_id.substring(0,35) + '1'
+            } else {
+                new_id = new_user_id.substring(0,35) + '2'
+            }
+            const response = await axios.delete(`${process.env.API_URL}/users/${new_id}`).catch(error => {
+                assert.strictEqual(error.response.status, 500)
+                assert.strictEqual(error.response.data.State, State.ERROR)
+                assert.strictEqual(error.response.data.ErrorMessage, 'Cannot find this user in the database')
+            })
         })
     })
 
-    await after(async() => {
+    after(async() => {
         await dbusers.delete_user_async(new_user_id)
     })
 })

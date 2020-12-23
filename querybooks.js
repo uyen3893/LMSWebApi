@@ -173,12 +173,22 @@ const deleteBook = (request, response) => {
 const deleteBookAsync = async (request, response) => {
     const id = request.params.id
     try {
-        const result = await dbbooks.delete_book_async(id)
-        let res = {
+        let db_result = await dbbooks.get_book_by_id_async(id)
+        if(db_result.rows.length != 0) {
+            const result = await dbbooks.delete_book_async(id)
+            let res = {
             State: State.SUCCESS,
             DeletedBookId: id
+            }
+            response.status(200).json(res)
+        } else {
+            let res = {
+                State: State.ERROR,
+                ErrorMessage: "Cannot find this book in the database"
+            }
+            response.status(500).json(res)
         }
-        response.status(200).json(res);
+        
     } catch (error) {
         console.error(error);
         let err = {
