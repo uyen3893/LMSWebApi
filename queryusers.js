@@ -173,12 +173,22 @@ const deleteUser = (request, response) => {
 const deleteUserAsync = async (request, response) => {
     try {
         const id = request.params.id;
-        const result = await dbusers.delete_user_async(id)
-        let res = {
+        const db_result = await dbusers.get_user_by_id_async(id)
+        if(db_result.rows.length != 0) {
+            const result = await dbusers.delete_user_async(id)
+            let res = {
             State: State.SUCCESS,
             DeletedUserId: id
+            }
+            response.status(200).json(res);
+        } else {
+            let res = {
+                State: State.ERROR,
+                ErrorMessage: "Cannot find this user in the database"
+            }
+            response.status(500).json(res)
         }
-        response.status(200).json(res);
+        
     } catch(error) {
         console.error(error);
             let err = {
