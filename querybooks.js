@@ -1,5 +1,6 @@
 
 const dbbooks = require('./dbbooks')
+const dbcategories = require('./dbcategories')
 const sql = require('./sql')
 
 const State = {
@@ -132,21 +133,41 @@ const updateBook = (request, response) => {
 const updateBookAsync = async (request, response) =>{
     const id = request.params.id;
     const {name, isbn, author, publisher, quantity, id_category} = request.body;
-    try {
-        const result = await dbbooks.update_book_async(isbn, name, author, publisher, quantity, id_category, id)
-        let res = {
-            State: State.SUCCESS,
-            UpdatedBookId: id
-        }
-        response.status(200).json(res);
-    } catch (error) {
-        console.error(error);
+    const get_book_by_id_result = await dbbooks.get_book_by_id_async(id)
+    if (get_book_by_id_result.rows.length !=0 ) {
+        const check_id_category = await dbcategories.get_category_by_id_async(id_category)
+        if(check_id_category.rows.length > 0) {
+            try {
+                const result = await dbbooks.update_book_async(isbn, name, author, publisher, quantity, id_category, id)
+                let res = {
+                    State: State.SUCCESS,
+                    UpdatedBookId: id
+                }
+                response.status(200).json(res);
+            } catch (error) {
+                console.error(error);
+                    let err = {
+                        State: State.ERROR,
+                        ErrorMessage: "Error occurs when execute query on database"
+                    }
+                    response.status(500).json(err);
+            }
+        } else {
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                ErrorMessage: "Invalid information"
             }
             response.status(500).json(err);
+        }
+    } else {
+        let err = {
+            State: State.ERROR,
+            ErrorMessage: "Cannot find this book in the database"
+        }
+        response.status(500).json(err);
     }
+    
+    
 }
 
 //Delete a book

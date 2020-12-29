@@ -130,23 +130,34 @@ const updateUser = (request, response) => {
     })
 }
 const updateUserAsync = async (request, response) => {
-    try {
-        const id = request.params.id;
-        const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
-        const result = await dbusers.update_user_async(name, cmnd, email, gender, birthdate, signupdate, expirydate, id)
-        let res = {
-            State: State.SUCCESS,
-            UpdatedUserId: id
+    const id = request.params.id;
+    const validUser = await dbusers.get_user_by_id_async(id)
+    if(validUser.rows.length != 0) {
+        try {
+            const id = request.params.id;
+            const {name, gender, cmnd, email, birthdate, signupdate, expirydate} = request.body;
+            const result = await dbusers.update_user_async(name, cmnd, email, gender, birthdate, signupdate, expirydate, id)
+            let res = {
+                State: State.SUCCESS,
+                UpdatedUserId: id
+            }
+            response.status(200).json(res);
+        } catch (error) {
+            console.log(error)
+            let err = {
+                State: State.ERROR,
+                ErrorMessage: "Error occurs when execute query on database"
+            }
+            response.status(500).json(err)
         }
-        response.status(200).json(res);
-    } catch (error) {
-        console.log(error)
+    } else {
         let err = {
             State: State.ERROR,
-            ErrorMessage: "Error occurs when execute query on database"
+            ErrorMessage: "Cannot find this user in the database"
         }
         response.status(500).json(err)
     }
+    
 }
 
 //Delete a user
