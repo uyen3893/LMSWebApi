@@ -9,13 +9,13 @@ const State = {
 }
 
 //Get list of books
-const getBooks = (request, response) => {
+const get_books_method = (request, response) => {
     dbbooks.get_books((error, result) => {
         if (error) {
             console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
             return;
@@ -24,7 +24,7 @@ const getBooks = (request, response) => {
     })
 }
 
-const getBooksAsync = async (request, response) => {
+const get_book_method_async = async (request, response) => {
     try {
         const result = await dbbooks.get_books_async()
         response.status(200).json(result.rows)
@@ -32,7 +32,7 @@ const getBooksAsync = async (request, response) => {
         console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
     }
@@ -40,14 +40,14 @@ const getBooksAsync = async (request, response) => {
 }
 
 //Get a book by ID
-const getBookByID = (request, response) => {
+const get_book_by_id_method = (request, response) => {
     const id = request.params.id
     dbbooks.get_book_by_id(id, (error, result) => {
         if(error) {
             console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
             return;
@@ -55,7 +55,7 @@ const getBookByID = (request, response) => {
         response.status(200).json(result.rows);
     })
 }
-const getBookByIDAsync = async (request, response) => {
+const get_book_by_id_method_async = async (request, response) => {
     const id = request.params.id
     try {
         const result = await dbbooks.get_book_by_id_async(id)
@@ -64,53 +64,53 @@ const getBookByIDAsync = async (request, response) => {
         console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
     }
 }
 
 //Create a book
-const createBook = (request, response) => {
+const create_book_method = (request, response) => {
     const {name, isbn, author, publisher, quantity, id_category} = request.body;
     dbbooks.create_book([isbn, name, author, publisher, quantity, id_category], (error, result) => {
         if(error) {
             console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
             return;
         }
         let res = {
             State: State.SUCCESS,
-            createdBookId: result.rows[0].new_id
+            Created_book_id: result.rows[0].new_id
         }
         response.status(201).json(res);
     })
 }
 
-const createBookAsync = async (request, response) => {
+const create_book_method_async = async (request, response) => {
     const {name, isbn, author, publisher, quantity, id_category} = request.body;
     try {
         const result = await dbbooks.create_book_async(isbn, name, author, publisher, quantity, id_category)
         let res = {
             State: State.SUCCESS,
-            createdBookId: result.rows[0].new_id
+            Created_book_id: result.rows[0].new_id
         }
         response.status(201).json(res);
     } catch (error) {
         console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
     }
 }
 //Update a book
-const updateBook = (request, response) => {
+const update_book_method = (request, response) => {
     const id = request.params.id;
     const {name, isbn, author, publisher, quantity, id_category} = request.body;
     dbbooks.update_book([isbn, name, author, publisher, quantity, id_category, id], (error, result) => {
@@ -118,19 +118,19 @@ const updateBook = (request, response) => {
             console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
             return;
         }
         let res = {
             State: State.SUCCESS,
-            UpdatedBookId: id
+            Updated_book_id: id
         }
         response.status(200).json(res);
     })
 }
-const updateBookAsync = async (request, response) =>{
+const update_book_method_async = async (request, response) =>{
     const id = request.params.id;
     const {name, isbn, author, publisher, quantity, id_category} = request.body;
     const get_book_by_id_result = await dbbooks.get_book_by_id_async(id)
@@ -141,28 +141,28 @@ const updateBookAsync = async (request, response) =>{
                 const result = await dbbooks.update_book_async(isbn, name, author, publisher, quantity, id_category, id)
                 let res = {
                     State: State.SUCCESS,
-                    UpdatedBookId: id
+                    Updated_book_id: id
                 }
                 response.status(200).json(res);
             } catch (error) {
                 console.error(error);
                     let err = {
                         State: State.ERROR,
-                        ErrorMessage: "Error occurs when execute query on database"
+                        Error_message: "Error occurs when execute query on database"
                     }
                     response.status(500).json(err);
             }
         } else {
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Invalid information"
+                Error_message: "Invalid information"
             }
             response.status(500).json(err);
         }
     } else {
         let err = {
             State: State.ERROR,
-            ErrorMessage: "Cannot find this book in the database"
+            Error_message: "Cannot find this book in the database"
         }
         response.status(500).json(err);
     }
@@ -171,27 +171,27 @@ const updateBookAsync = async (request, response) =>{
 }
 
 //Delete a book
-const deleteBook = (request, response) => {
+const delete_book_method = (request, response) => {
     const id = request.params.id;
     dbbooks.delete_book(id, (error, result) => {
         if (error) {
             console.error(error);
             let err = {
                 State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                Error_message: "Error occurs when execute query on database"
             }
             response.status(500).json(err);
             return;
         }
         let res = {
             State: State.SUCCESS,
-            DeletedBookId: id
+            Deleted_book_id: id
         }
         response.status(200).json(res);
     })
 }
 
-const deleteBookAsync = async (request, response) => {
+const delete_book_method_async = async (request, response) => {
     const id = request.params.id
     try {
         let db_result = await dbbooks.get_book_by_id_async(id)
@@ -199,13 +199,13 @@ const deleteBookAsync = async (request, response) => {
             const result = await dbbooks.delete_book_async(id)
             let res = {
             State: State.SUCCESS,
-            DeletedBookId: id
+            Deleted_book_id: id
             }
             response.status(200).json(res)
         } else {
             let res = {
                 State: State.ERROR,
-                ErrorMessage: "Cannot find this book in the database"
+                Error_message: "Cannot find this book in the database"
             }
             response.status(500).json(res)
         }
@@ -214,21 +214,21 @@ const deleteBookAsync = async (request, response) => {
         console.error(error);
         let err = {
             State: State.ERROR,
-            ErrorMessage: "Error occurs when execute query on database"
+            Error_message: "Error occurs when execute query on database"
         }
         response.status(500).json(err);
     }
 }
 
 module.exports = {
-    getBooks,
-    getBooksAsync,
-    getBookByID,
-    getBookByIDAsync,
-    createBook,
-    createBookAsync,
-    updateBook,
-    updateBookAsync,
-    deleteBook,
-    deleteBookAsync
+    get_books_method,
+    get_book_method_async,
+    get_book_by_id_method,
+    get_book_by_id_method_async,
+    create_book_method,
+    create_book_method_async,
+    update_book_method,
+    update_book_method_async,
+    delete_book_method,
+    delete_book_method_async
 }
