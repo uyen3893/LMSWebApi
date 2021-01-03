@@ -2,7 +2,7 @@ require('dotenv').config()
 const assert = require('assert')
 const dbusers = require('../dbusers')
 const axios = require('axios')
-const message = require('../message')
+const responseEnums = require('../responseEnums')
 
 
 const birth_date = new Date(1999, 01, 01)
@@ -58,10 +58,10 @@ describe("users api", async() => {
             assert.strictEqual(response.status, 200);
         })
         it('3. should return status 500 and State will be error when called with incorrect id format', async() => {
-            await axios.get( `${process.env.API_URL}/users/${wrong_id}`).catch(error=>{
+            await axios.get( `${process.env.API_URL}/users/1`).catch(error=>{
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.ERROR)
             })
         })
         it('4. should return status 200 and empty array when called with incorrect id\'s value', async() => {
@@ -81,7 +81,7 @@ describe("users api", async() => {
                 signupdate: sign_up_date.toLocaleDateString(),
                 expirydate: expiry_date.toLocaleDateString()
             })
-            user_id_for_create_testcase = response.data.Created_user_id
+            user_id_for_create_testcase = response.data.Created_User_Id
             const result = await dbusers.get_user_by_id_async(user_id_for_create_testcase)
             const dbUser = result.rows[0];
             assert.strictEqual(dbUser.name, name);
@@ -97,8 +97,8 @@ describe("users api", async() => {
         it('6. should return status 500 and State will be error when called with incorrect parameters', async() => {
             await axios.post(`${process.env.API_URL}/users`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.ERROR)
             })
         })
     })
@@ -126,8 +126,8 @@ describe("users api", async() => {
                 expirydate: updated_expiry_date.toLocaleDateString()
             })
             assert.strictEqual(response.status, 200)
-            assert.strictEqual(response.data.State, message.State.SUCCESS)
-            assert.strictEqual(response.data.Updated_user_id, user_id_for_update_testcase)
+            assert.strictEqual(response.data.State, responseEnums.State.SUCCESS)
+            assert.strictEqual(response.data.Updated_User_Id, user_id_for_update_testcase)
 
             const updated_result = await dbusers.get_user_by_id_async(user_id_for_update_testcase)
             const dbUser = updated_result.rows[0];
@@ -144,41 +144,49 @@ describe("users api", async() => {
         it('8. should return status 500 and State will be error when called incorrectly', async() => {
             await axios.put(`${process.env.API_URL}/users/${user_id_for_update_testcase}`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.INVALID)
             })
         })
         
         it('9. should return status 500 and State will be error when called with wrong id\'s value', async() => {
             await axios.put(`${process.env.API_URL}/users/${wrong_id}`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message_while_finding_an_entity('user'))
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.FINDING_ERROR('user'))
             })
         })
-        
-    })
+
+        it('10. should return status 500 and State will be error when called with a wrong id\'s format', async() => {
+            await axios.put(`${process.env.API_URL}/users/1`, {}).catch(error => {
+                assert.strictEqual(error.response.status, 500)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.INVALID)
+            })
+        })
+    })  
+
     describe('delete user', async() => {
-        it('9. should return status 200 and delete user when called successfully', async() => {
+        it('11. should return status 200 and delete user when called successfully', async() => {
             const response = await axios.delete( `${process.env.API_URL}/users/${user_id_for_delete_testcase}`)
             const db_result = await dbusers.get_user_by_id_async(user_id_for_delete_testcase)
             assert.strictEqual(db_result.rowCount, 0)
             assert.strictEqual(response.status, 200)
-            assert.strictEqual(response.data.State, message.State.SUCCESS)
-            assert.strictEqual(response.data.Deleted_user_id, user_id_for_delete_testcase)
+            assert.strictEqual(response.data.State, responseEnums.State.SUCCESS)
+            assert.strictEqual(response.data.Deleted_User_Id, user_id_for_delete_testcase)
         })
-        it('10. should return status 500 and State will be error when called with wrong id\'s format', async() => {
+        it('12. should return status 500 and State will be error when called with wrong id\'s format', async() => {
             const response = await axios.delete( `${process.env.API_URL}/users/1`).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.ERROR)
             })
         })
-        it('11.should return status 500 and State will be error when called with wrong id\'s value', async() => {
+        it('13.should return status 500 and State will be error when called with wrong id\'s value', async() => {
             const response = await axios.delete(`${process.env.API_URL}/users/${wrong_id}`).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.ERROR)
             })
         })
     })

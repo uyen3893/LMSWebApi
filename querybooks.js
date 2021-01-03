@@ -2,11 +2,8 @@
 const dbbooks = require('./dbbooks')
 const dbcategories = require('./dbcategories')
 const sql = require('./sql')
+const responseEnums = require('./responseEnums')
 
-const State = {
-    SUCCESS: "Success",
-    ERROR: "Error"
-}
 
 //Get list of books
 const get_books_method = (request, response) => {
@@ -14,8 +11,8 @@ const get_books_method = (request, response) => {
         if (error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -31,8 +28,8 @@ const get_book_method_async = async (request, response) => {
     } catch (error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
@@ -46,8 +43,8 @@ const get_book_by_id_method = (request, response) => {
         if(error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -63,8 +60,8 @@ const get_book_by_id_method_async = async (request, response) => {
     } catch(error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
@@ -77,15 +74,15 @@ const create_book_method = (request, response) => {
         if(error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
         }
         let res = {
-            State: State.SUCCESS,
-            Created_book_id: result.rows[0].new_id
+            State: responseEnums.State.SUCCESS,
+            Created_Book_Id: result.rows[0].new_id
         }
         response.status(201).json(res);
     })
@@ -96,15 +93,15 @@ const create_book_method_async = async (request, response) => {
     try {
         const result = await dbbooks.create_book_async(isbn, name, author, publisher, quantity, id_category)
         let res = {
-            State: State.SUCCESS,
-            Created_book_id: result.rows[0].new_id
+            State: responseEnums.State.SUCCESS,
+            Created_Book_Id: result.rows[0].new_id
         }
         response.status(201).json(res);
     } catch (error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
@@ -117,15 +114,15 @@ const update_book_method = (request, response) => {
         if (error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
         }
         let res = {
-            State: State.SUCCESS,
-            Updated_book_id: id
+            State: responseEnums.State.SUCCESS,
+            Updated_Book_Id: id
         }
         response.status(200).json(res);
     })
@@ -133,40 +130,39 @@ const update_book_method = (request, response) => {
 const update_book_method_async = async (request, response) =>{
     const id = request.params.id;
     const {name, isbn, author, publisher, quantity, id_category} = request.body;
-    const get_book_by_id_result = await dbbooks.get_book_by_id_async(id)
-    if (get_book_by_id_result.rows.length !=0 ) {
-        const check_id_category = await dbcategories.get_category_by_id_async(id_category)
-        if(check_id_category.rows.length > 0) {
-            try {
-                const result = await dbbooks.update_book_async(isbn, name, author, publisher, quantity, id_category, id)
-                let res = {
-                    State: State.SUCCESS,
-                    Updated_book_id: id
-                }
-                response.status(200).json(res);
-            } catch (error) {
-                console.error(error);
-                    let err = {
-                        State: State.ERROR,
-                        Error_message: "Error occurs when execute query on database"
+        const get_book_by_id_result = await dbbooks.get_book_by_id_async(id)
+        if (get_book_by_id_result.rows.length !=0 ) {
+            const check_id_category = await dbcategories.get_category_by_id_async(id_category)
+            if(check_id_category.rows.length != 0) {
+                try {
+                    const result = await dbbooks.update_book_async(isbn, name, author, publisher, quantity, id_category, id)
+                    let res = {
+                        State: responseEnums.State.SUCCESS,
+                        Updated_Book_Id: id
                     }
-                    response.status(500).json(err);
+                    response.status(200).json(res);
+                } catch (error) {
+                    console.error(error);
+                        let err = {
+                            State: responseEnums.State.ERROR,
+                            Error_Message: responseEnums.Error_Message.ERROR
+                        }
+                        response.status(500).json(err);
+                }
+            } else {
+                let err = {
+                    State: responseEnums.State.ERROR,
+                    Error_Message: responseEnums.Error_Message.FINDING_ERROR('category')
+                }
+                response.status(500).json(err);
             }
         } else {
             let err = {
-                State: State.ERROR,
-                Error_message: "Invalid information"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.FINDING_ERROR('book')
             }
             response.status(500).json(err);
         }
-    } else {
-        let err = {
-            State: State.ERROR,
-            Error_message: "Cannot find this book in the database"
-        }
-        response.status(500).json(err);
-    }
-    
     
 }
 
@@ -177,15 +173,15 @@ const delete_book_method = (request, response) => {
         if (error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                Error_message: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
         }
         let res = {
-            State: State.SUCCESS,
-            Deleted_book_id: id
+            State: responseEnums.State.SUCCESS,
+            Deleted_Book_Id: id
         }
         response.status(200).json(res);
     })
@@ -193,30 +189,38 @@ const delete_book_method = (request, response) => {
 
 const delete_book_method_async = async (request, response) => {
     const id = request.params.id
-    try {
-        let db_result = await dbbooks.get_book_by_id_async(id)
-        if(db_result.rows.length != 0) {
-            const result = await dbbooks.delete_book_async(id)
-            let res = {
-            State: State.SUCCESS,
-            Deleted_book_id: id
-            }
-            response.status(200).json(res)
-        } else {
-            let res = {
-                State: State.ERROR,
-                Error_message: "Cannot find this book in the database"
-            }
-            response.status(500).json(res)
-        }
-        
-    } catch (error) {
-        console.error(error);
+    if (id.length != 36) {
         let err = {
-            State: State.ERROR,
-            Error_message: "Error occurs when execute query on database"
+            State: responseEnums.State.ERROR,
+            Error_Message: responseEnums.Error_Message.INVALID
         }
         response.status(500).json(err);
+    } else {
+        try {
+            let db_result = await dbbooks.get_book_by_id_async(id)
+            if(db_result.rows.length != 0) {
+                const result = await dbbooks.delete_book_async(id)
+                let res = {
+                State: responseEnums.State.SUCCESS,
+                Deleted_Book_Id: id
+                }
+                response.status(200).json(res)
+            } else {
+                let res = {
+                    State: responseEnums.State.ERROR,
+                    Error_Message: responseEnums.Error_Message.FINDING_ERROR('book')
+                }
+                response.status(500).json(res)
+            }
+            
+        } catch (error) {
+            console.error(error);
+            let err = {
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
+            }
+            response.status(500).json(err);
+        }
     }
 }
 

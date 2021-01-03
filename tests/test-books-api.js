@@ -4,7 +4,7 @@ const assert = require('assert')
 const axios = require('axios')
 const dbusers = require('../dbusers')
 const dbcategories = require('../dbcategories')
-const message = require('../message')
+const responseEnums = require('../responseEnums')
 
 
 const isbn = '123456sdfa123'
@@ -71,8 +71,8 @@ describe('books api', async() => {
 
         it('3. should return status 500 and the data response will give the error message when called with the wrong id format', async() => {
             let response = await axios.get(`${process.env.API_URL}/books/1`).catch(error => {
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.ERROR)
                 assert.strictEqual(error.response.status, 500)
             })
         })
@@ -95,8 +95,8 @@ describe('books api', async() => {
                 id_category: category_id
             })
             assert.strictEqual(response.status, 201)
-            assert.strictEqual(response.data.State, message.State.SUCCESS)
-            book_id_for_create_testcase = response.data.Created_book_id
+            assert.strictEqual(response.data.State, responseEnums.State.SUCCESS)
+            book_id_for_create_testcase = response.data.Created_Book_Id
 
             let result = await dbbooks.get_book_by_id_async(book_id_for_create_testcase)
             assert.strictEqual(result.rows[0].isbn, isbn)
@@ -110,8 +110,8 @@ describe('books api', async() => {
         it('6.should return status 500 and the State response will be error when called with no parameters', async() => {
             let response = await axios.post(`${process.env.API_URL}/books`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.ERROR)
             })
         })
     })
@@ -127,7 +127,8 @@ describe('books api', async() => {
                 id_category: category_id_for_update_testcase
             })
             assert.strictEqual(response.status, 200)
-            assert.strictEqual(response.data.State, message.State.SUCCESS)
+            assert.strictEqual(response.data.State, responseEnums.State.SUCCESS)
+            assert.strictEqual(response.data.Updated_Book_Id, book_id_for_update_testcase)
 
             let result = await dbbooks.get_book_by_id_async(book_id_for_update_testcase)
             assert.strictEqual(result.rows[0].isbn, book_isbn)
@@ -141,8 +142,8 @@ describe('books api', async() => {
         it('8.should return status 500 and the State response will be error when called with no parameters', async() => {
             let response = await axios.put(`${process.env.API_URL}/books/${book_id_for_update_testcase}`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.Error_message, message.invalid_error_message)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.FINDING_ERROR('category'))
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
             })
         })
 
@@ -156,16 +157,16 @@ describe('books api', async() => {
                 id_category: wrong_id
             }).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.Error_message, message.invalid_error_message)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.FINDING_ERROR('category'))
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
             })
         })
 
         it('10. should return status 500 and the State response will be error when called with a wrong id book\'s value', async() => {
             let response = await axios.put(`${process.env.API_URL}/books/${wrong_id}`, {}).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.Error_message, message.error_message_while_finding_an_entity('book'))
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.FINDING_ERROR('book'))
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
             })
         })
     })
@@ -175,24 +176,24 @@ describe('books api', async() => {
             let response = await axios.delete(`${process.env.API_URL}/books/${book_id_for_delete_testcase}`)
             let result = await dbbooks.get_book_by_id_async(book_id_for_delete_testcase)
             assert.strictEqual(response.status, 200)
-            assert.strictEqual(response.data.Deleted_book_id, book_id_for_delete_testcase)
-            assert.strictEqual(response.data.State, message.State.SUCCESS)
+            assert.strictEqual(response.data.Deleted_Book_Id, book_id_for_delete_testcase)
+            assert.strictEqual(response.data.State, responseEnums.State.SUCCESS)
             assert.strictEqual(result.rows.length, 0)
         })
 
         it('12. should return status 500 and the State response will be error when called with wrong id\'s format', async() => {
             let response = await axios.delete(`${process.env.API_URL}/books/1`).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message)
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.INVALID)
             })
         })
 
-        it('13. should return status 500 and the State response will be error when called with wrong id\'s format', async() => {
+        it('13. should return status 500 and the State response will be error when called with wrong id\'s value', async() => {
             let response = await axios.delete(`${process.env.API_URL}/books/${wrong_id}`).catch(error => {
                 assert.strictEqual(error.response.status, 500)
-                assert.strictEqual(error.response.data.State, message.State.ERROR)
-                assert.strictEqual(error.response.data.Error_message, message.error_message_while_finding_an_entity('book'))
+                assert.strictEqual(error.response.data.State, responseEnums.State.ERROR)
+                assert.strictEqual(error.response.data.Error_Message, responseEnums.Error_Message.FINDING_ERROR('book'))
             })
         })
     })
