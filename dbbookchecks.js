@@ -44,5 +44,8 @@ module.exports = {
     },
     async delete_bookcheck_async (id) {
         return await sql.query_async('CALL public."DeleteBookCheck" ($1)', [id])
+    },
+    async delete_bookcheck_by_user_id_async(id) {
+        return await sql.query_async('CALL public."DeleteBookCheckByUserId" ($1)', [id])
     }
 }

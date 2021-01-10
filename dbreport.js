@@ -2,12 +2,12 @@ const sql = require('./sql')
 
 module.exports = {
     get_number_of_users: (callback) => {
-        sql.query('SELECT * FROM "ThongKeSoLuongDocGia"', (error, result) => {
+        sql.query('SELECT COUNT(1) AS Total FROM users', (error, result) => {
             callback(error, result)
         })
     },
     async get_number_of_users_async () {
-        return await sql.query_async('SELECT * FROM "ThongKeSoLuongDocGia"')
+        return await sql.query_async('SELECT COUNT(1) AS Total FROM users')
     },
     get_number_of_users_by_gender: (callback) => {
         sql.query('SELECT * FROM "ThongKeSoLuongDocGiaTheoGioiTinh"', (error, result) => {

@@ -1,20 +1,16 @@
 
 const sql = require('./sql')
 const dbreport = require('./dbreport')
-
-const State = {
-    SUCCESS: "Success",
-    ERROR: "Error"
-}
+const responseEnums = require('./responseEnums')
 
 //The number of users' report
-const getNumberOfUsers = (request, response) => {
+const get_number_of_users_method = (request, response) => {
     dbreport.get_number_of_users((error, result) => {
         if (error) {
-            console.error(error);
+            console.error(error)
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -22,28 +18,28 @@ const getNumberOfUsers = (request, response) => {
         response.status(200).json(result.rows);
     })
 }
-const getNumberOfUsersAsync = async (request, response) => {
+const get_number_of_users_method_async = async (request, response) => {
     try {
         const result = await dbreport.get_number_of_users_async()
         response.status(200).json(result.rows);
     } catch(error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
 }
 
 //The number of users' gender report
-const getNumberOfUsersByGender = (request, response) => {
+const get_number_of_users_by_gender_method = (request, response) => {
     dbreport.get_number_of_users_by_gender((error, result) => {
         if (error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -51,28 +47,28 @@ const getNumberOfUsersByGender = (request, response) => {
         response.status(200).json(result.rows);
     })
 }
-const getNumberOfUsersByGenderAsync = async (request, response) => {
+const get_number_of_users_by_gender_method_async = async (request, response) => {
     try {
         const result = await dbreport.get_number_of_users_by_gender_async()
         response.status(200).json(result.rows);
     } catch (error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
 }
 
 //The number of books' report
-const getNumberOfBooks = (request, response) => {
+const get_number_of_books_method = (request, response) => {
     dbreport.get_number_of_books((error, result) => {
         if (error) {
             console.error(err);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -80,28 +76,28 @@ const getNumberOfBooks = (request, response) => {
         response.status(200).json(result.rows);
     })
 }
-const getNumberOfBooksAsync = async (request, response) => {
+const get_number_of_books_method_async = async (request, response) => {
     try{
         const result = await dbreport.get_number_of_books_async()
         response.status(200).json(result.rows);
     } catch (error) {
         console.error(err);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
 }
 
 //The number of borrowed books' report
-const getNumberOfBorrowedBooks = (request, response) => {
+const get_number_of_borrowed_books_method = (request, response) => {
     dbreport.get_number_of_borrowed_books((error, result) => {
         if (error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -109,28 +105,28 @@ const getNumberOfBorrowedBooks = (request, response) => {
         response.status(200).json(result.rows);
     })
 }
-const getNumberOfBorrowedBooksAsync = async (request, response) => {
+const get_number_of_borrowed_books_method_async = async (request, response) => {
     try {
         const result = await dbreport.get_number_of_borrowed_books_async()
         response.status(200).json(result.rows);
     } catch(error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
 }
 
 //The number of books by categories' report
-const getNumberOfBooksByCategories = (request, response) => {
+const get_number_of_books_by_categories_method = (request, response) => {
     dbreport.get_number_of_books_by_categories((error, result) => {
         if (error) {
             console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
             return;
@@ -138,30 +134,29 @@ const getNumberOfBooksByCategories = (request, response) => {
         response.status(200).json(result.rows);
     })
 }
-const getNumberOfBooksByCategoriesAsync = async (request, response) => {
+const get_number_of_books_by_categories_method_async = async (request, response) => {
     try {
         const result = await dbreport.get_number_of_books_by_categories_async()
         response.status(200).json(result.rows);
     } catch (error) {
         console.error(error);
             let err = {
-                State: State.ERROR,
-                ErrorMessage: "Error occurs when execute query on database"
+                State: responseEnums.State.ERROR,
+                Error_Message: responseEnums.Error_Message.ERROR
             }
             response.status(500).json(err);
     }
 }
 
 module.exports = {
-    getNumberOfUsersByGender,
-    getNumberOfUsers,
-    getNumberOfUsersAsync,
-    getNumberOfUsersByGender,
-    getNumberOfUsersByGenderAsync,
-    getNumberOfBooks,
-    getNumberOfBooksAsync,
-    getNumberOfBorrowedBooks,
-    getNumberOfBorrowedBooksAsync,
-    getNumberOfBooksByCategories,
-    getNumberOfBooksByCategoriesAsync
+    get_number_of_users_method,
+    get_number_of_users_method_async,
+    get_number_of_users_by_gender_method,
+    get_number_of_users_by_gender_method_async,
+    get_number_of_books_method,
+    get_number_of_books_method_async,
+    get_number_of_borrowed_books_method,
+    get_number_of_borrowed_books_method_async,
+    get_number_of_books_by_categories_method,
+    get_number_of_books_by_categories_method_async
 }
