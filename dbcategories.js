@@ -40,5 +40,11 @@ module.exports = {
     },
     async delete_category_async (id) {
         return await sql.query_async('CALL public."DeleteCategory" ($1)', [id])
+    },
+    async count_number_of_categories_async () {
+        return await sql.query_async('SELECT COUNT(1) FROM categories')
+    },
+    async get_category_by_name(name) {
+        return await sql.query_async('SELECT id FROM categories WHERE name = $1', [name])
     }
 }
